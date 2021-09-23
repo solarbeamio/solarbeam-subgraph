@@ -1,16 +1,16 @@
 specVersion: 0.0.2
-description: Uniswap is a decentralized protocol for automated token exchange on Ethereum.
-repository: https://github.com/Uniswap/uniswap-v2-subgraph
+description: Solarbeam is a decentralized protocol for automated token exchange on Moonriver.
+repository: https://github.com/solarbeamio/solarbeam-subgraph
 schema:
   file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: mriver
+    network: moonriver
     source:
-      address: "0x056973f631a5533470143bb7010c9229c19c04d2"
+      address: "0x049581aEB6Fe262727f290165C29BDAB065a1B68"
       abi: Factory
-      startBlock: 413536
+      startBlock: 442666
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -34,7 +34,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: mriver
+    network: moonriver
     source:
       abi: Pair
     mapping:

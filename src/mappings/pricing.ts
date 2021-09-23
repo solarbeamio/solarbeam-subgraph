@@ -1,44 +1,44 @@
 /* eslint-disable prefer-const */
 import { Pair, Token, Bundle } from '../types/schema'
-import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts/index'
+import { BigDecimal, Address, BigInt, log } from '@graphprotocol/graph-ts/index'
 import { ZERO_BD, factoryContract, ADDRESS_ZERO, ONE_BD } from './helpers'
 
-const WETH_ADDRESS = '0x98878b06940ae243284ca214f92bb71a2b032b8a'
-const USDC_WETH_PAIR = '0xe537f70a8b62204832B8Ba91940B77d3f79AEb81' 
+let WMOVR_ADDRESS = '0x98878b06940ae243284ca214f92bb71a2b032b8a'
+let WMOVR_USDC_ADDRESS = '0xe537f70a8b62204832b8ba91940b77d3f79aeb81'
+let USDC = '0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d'
+
+let WHITELIST: string[] = [
+  '0x6bd193ee6d2104f14f94e2ca6efefae561a4334b', //SOLAR
+  '0x98878b06940ae243284ca214f92bb71a2b032b8a', //WMOVR
+  '0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d', //USDC
+  '0x5d9ab5522c64e1f6ef5e3627eccc093f56167818' //BUSD
+]
+
 export function getEthPriceInUSD(): BigDecimal {
-  
-  let usdcPair = Pair.load(USDC_WETH_PAIR)
-  
+  let usdcPair = Pair.load(WMOVR_USDC_ADDRESS)
+
   if (usdcPair !== null) {
-    return usdcPair.token1Price
+    log.debug('usdcPair {0}, {1}', [usdcPair.token0Price.toString(), usdcPair.token1Price.toString()])
+    let isUsdcFirst = usdcPair.token0 == USDC
+    return isUsdcFirst ? usdcPair.token0Price : usdcPair.token1Price
   } else {
+    log.warning('No usdcPair', [])
     return ZERO_BD
   }
 }
 
-// token where amounts should contribute to tracked volume and liquidity
-let WHITELIST: string[] = [
-  '0x98878b06940ae243284ca214f92bb71a2b032b8a', 
-  '0xb44a9b6905af7c801311e8f4e76932ee959c663c', 
-  '0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d', 
-  '0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844', 
-  '0x5d9ab5522c64e1f6ef5e3627eccc093f56167818',  
-  '0x6bD193Ee6D2104F14F94E2cA6efefae561A4334B'
-
-]
-
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
-let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('10000')
+let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('3000')
 
 // minimum liquidity for price to get tracked
-let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
+let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('5')
 
 /**
  * Search through graph to find derived Eth per token.
  * @todo update to be derived ETH (add stablecoin estimates)
  **/
 export function findEthPerToken(token: Token): BigDecimal {
-  if (token.id == WETH_ADDRESS) {
+  if (token.id == WMOVR_ADDRESS) {
     return ONE_BD
   }
   // loop through whitelist and check if paired with any
@@ -75,7 +75,6 @@ export function getTrackedVolumeUSD(
   let bundle = Bundle.load('1')
   let price0 = token0.derivedETH.times(bundle.ethPrice)
   let price1 = token1.derivedETH.times(bundle.ethPrice)
-
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
   if (pair.liquidityProviderCount.lt(BigInt.fromI32(5))) {
@@ -151,6 +150,5 @@ export function getTrackedLiquidityUSD(
     return tokenAmount1.times(price1).times(BigDecimal.fromString('2'))
   }
 
-  // neither token is on white list, tracked volume is 0
   return ZERO_BD
 }
