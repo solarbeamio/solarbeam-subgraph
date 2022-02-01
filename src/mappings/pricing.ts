@@ -11,7 +11,8 @@ let WHITELIST: string[] = [
   '0x6bd193ee6d2104f14f94e2ca6efefae561a4334b', //SOLAR
   '0x98878b06940ae243284ca214f92bb71a2b032b8a', //WMOVR
   '0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d', //USDC
-  '0x5d9ab5522c64e1f6ef5e3627eccc093f56167818' //BUSD
+  '0x5d9ab5522c64e1f6ef5e3627eccc093f56167818', //BUSD
+  '0x1a93b23281cc1cde4c4741353f3064709a16197d' //FRAX
 ]
 
 export function getEthPriceInUSD(): BigDecimal {
