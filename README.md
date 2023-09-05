@@ -15,6 +15,13 @@ This subgraph dynamically tracks any pair created by the uniswap factory. It tra
 
 Make sure to update package.json settings to point to your own graph account.
 
+## Deploy on theGraph.com Hosted Service
+ - npm install
+ - npm install -g @graphprotocol/graph-cli
+ - npm run codegen
+ - npm run build
+ - npm run deploy (On deploy npm script in package.json change accordingly account_name, project_name and access_token)
+ 
 ## Queries
 
 Below are a few ways to show how to query the uniswap-subgraph for data. The queries show most of the information that is queryable, but there are many other filtering options that can be used, just check out the [querying api](https://thegraph.com/docs/graphql-api). These queries can be used locally or in The Graph Explorer playground.
