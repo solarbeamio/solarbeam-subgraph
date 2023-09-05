@@ -6,6 +6,8 @@ import { ZERO_BD, factoryContract, ADDRESS_ZERO, ONE_BD } from './helpers'
 let WMOVR_ADDRESS = '0x98878b06940ae243284ca214f92bb71a2b032b8a'
 let WMOVR_USDC_ADDRESS = '0xe537f70a8b62204832b8ba91940b77d3f79aeb81'
 let USDC = '0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d'
+let WMOVR_FRAX = '0x2cc54b4a3878e36e1c754871438113c1117a3ad7'
+let FRAX = '0x1a93b23281cc1cde4c4741353f3064709a16197d'
 
 let WHITELIST: string[] = [
   '0x6bd193ee6d2104f14f94e2ca6efefae561a4334b', //SOLAR
@@ -16,14 +18,23 @@ let WHITELIST: string[] = [
 ]
 
 export function getEthPriceInUSD(): BigDecimal {
+
+  // load FRAX pair for current pricing
+  let fraxPair = Pair.load(WMOVR_FRAX)
+
+  // load USDC pair for all time pricing
   let usdcPair = Pair.load(WMOVR_USDC_ADDRESS)
 
-  if (usdcPair !== null) {
-    log.debug('usdcPair {0}, {1}', [usdcPair.token0Price.toString(), usdcPair.token1Price.toString()])
+  if (fraxPair !== null) {
+    log.debug('fraxPair {}, {}', [fraxPair.token0Price.toString(), fraxPair.token1Price.toString()])
+    let isFraxFirst = fraxPair.token0 == FRAX
+    return isFraxFirst ? fraxPair.token0Price : fraxPair.token1Price
+  } else if (usdcPair !== null) {
+    log.debug('usdcPair {}, {}', [usdcPair.token0Price.toString(), usdcPair.token1Price.toString()])
     let isUsdcFirst = usdcPair.token0 == USDC
     return isUsdcFirst ? usdcPair.token0Price : usdcPair.token1Price
   } else {
-    log.warning('No usdcPair', [])
+    log.warning('No fraxPair or usdcPair', [])
     return ZERO_BD
   }
 }
